@@ -783,7 +783,7 @@ public class LipProtocolUnits {
         put(4, "less than 20 km");
         put(5, "less than or equal to 200 km");
         put(6, "more than 200 km");
-        put(7, "Position error not known ");
+        put(7, "Position error not known");
 
     }});
 
@@ -809,7 +809,7 @@ public class LipProtocolUnits {
     }});
 
     //Table 6.120: Type of additional data information element contents
-    private final BaseProtocolUnits typeOfAdditionalData = new BaseProtocolUnits(4, new HashMap<Integer, String>() {
+    private final BaseProtocolUnits typeOfAdditionalData = new BaseProtocolUnits(1, new HashMap<Integer, String>() {
         {
             put(0, "Reason for sending");
             put(1, "User defined data");
