@@ -28,7 +28,7 @@ public class ParserHelper {
         BigDecimal roundLatitude = new BigDecimal(latitude).setScale(10, RoundingMode.HALF_UP);
         //define a positive or negative number
         if (lipBinLatitude.substring(0, 1).equalsIgnoreCase("0")) {
-            return lipBinLatitude;
+            return roundLatitude.toString();
         } else {
            return "-" + roundLatitude;
         }

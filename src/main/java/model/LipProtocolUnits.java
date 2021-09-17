@@ -8,7 +8,7 @@ public class LipProtocolUnits {
     //Table 6.91: PDU type information element contents
     private final BaseProtocolUnits pduType = new BaseProtocolUnits(2, new HashMap<Integer, String>() {{
         put(0, "Short Location report");
-        put(1, "Long location report");
+        put(1, "Location protocol PDU with extension");
         put(2, "Reserved for further extension, will not be used in phase 1");
         put(3, "Reserved for further extension, will not be used in phase 1");
     }});
@@ -1076,9 +1076,9 @@ public class LipProtocolUnits {
     }});
 
     //Table 6.31: Acknowledgement request information element contents
-    private final BaseProtocolUnits acknowledgementRequest = new BaseProtocolUnits(4, new HashMap<Integer, String>() {
+    private final BaseProtocolUnits acknowledgementRequest = new BaseProtocolUnits(1, new HashMap<Integer, String>() {
         {
-            put(0, "No acknowledgement requested ");
+            put(0, "No acknowledgement requested");
             put(1, "Acknowledgement requested");
         }});
 
