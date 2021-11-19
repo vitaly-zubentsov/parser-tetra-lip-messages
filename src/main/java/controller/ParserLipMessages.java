@@ -51,6 +51,7 @@ public class ParserLipMessages {
         messageForParsing.delete(0, timeType.getCountOfBits());
         messageFromLip.addParsedPart(timeTypeInBits, timeTypeInDec, timeType.getData().get(timeTypeInDec));
 
+        //if "none", then nothing to do
         if (timeTypeInDec == 1) {
             //Parse Time Elapsed
             BaseProtocolUnits timeElapsed = lipProtocolUnits.getTimeElapsed();
@@ -83,6 +84,9 @@ public class ParserLipMessages {
             int secondTimeOfPositionInDec = convertBinToDec(secondTimeOfPositionInBits);
             messageForParsing.delete(0, secondTimeOfPosition.getCountOfBits());
             messageFromLip.addParsedPart(secondTimeOfPositionInBits, secondTimeOfPositionInDec, secondTimeOfPosition.getData().get(secondTimeOfPositionInDec));
+        } if  (timeTypeInDec == 3) {
+            messageFromLip.addParsedPart("", 0, "time type shape is reserved. The program cannot " +
+                    "parse further. All parsing further may be invalid");
         }
 
         BaseProtocolUnits locationShape = lipProtocolUnits.getLocationShape();
@@ -91,26 +95,33 @@ public class ParserLipMessages {
         messageForParsing.delete(0, locationShape.getCountOfBits());
         messageFromLip.addParsedPart(locationShapeInBits, locationShapeInDec, locationShape.getData().get(locationShapeInDec));
 
-        String lipLongitudeInBits = messageForParsing.substring(0, 25);
-        messageForParsing.delete(0, 25);
-        messageFromLip.addParsedPart(lipLongitudeInBits,
-                convertBinToDec(lipLongitudeInBits), calculateLongitudeFromLipBits(lipLongitudeInBits));
+        //if "no shape", then nothing to do
+        if (locationShapeInDec == 5) {
+            //Parse location circle with altitude
+            String lipLongitudeInBits = messageForParsing.substring(0, 25);
+            messageForParsing.delete(0, 25);
+            messageFromLip.addParsedPart(lipLongitudeInBits,
+                    convertBinToDec(lipLongitudeInBits), calculateLongitudeFromLipBits(lipLongitudeInBits));
 
-        String lipLatitudeInBits = messageForParsing.substring(0, 24);
-        messageForParsing.delete(0, 24);
-        messageFromLip.addParsedPart(lipLatitudeInBits,
-                convertBinToDec(lipLatitudeInBits), calculateLatitudeFromLipBits(lipLatitudeInBits));
+            String lipLatitudeInBits = messageForParsing.substring(0, 24);
+            messageForParsing.delete(0, 24);
+            messageFromLip.addParsedPart(lipLatitudeInBits,
+                    convertBinToDec(lipLatitudeInBits), calculateLatitudeFromLipBits(lipLatitudeInBits));
 
-        BaseProtocolUnits positionUncertainty = lipProtocolUnits.getHorizontalPositionUncertainty();
-        String positionUncertaintyInBits = messageForParsing.substring(0, positionUncertainty.getCountOfBits());
-        int positionUncertaintyInDec = convertBinToDec(positionUncertaintyInBits);
-        messageForParsing.delete(0, positionUncertainty.getCountOfBits());
-        messageFromLip.addParsedPart(positionUncertaintyInBits, positionUncertaintyInDec, positionUncertainty.getData().get(positionUncertaintyInDec));
+            BaseProtocolUnits positionUncertainty = lipProtocolUnits.getHorizontalPositionUncertainty();
+            String positionUncertaintyInBits = messageForParsing.substring(0, positionUncertainty.getCountOfBits());
+            int positionUncertaintyInDec = convertBinToDec(positionUncertaintyInBits);
+            messageForParsing.delete(0, positionUncertainty.getCountOfBits());
+            messageFromLip.addParsedPart(positionUncertaintyInBits, positionUncertaintyInDec, positionUncertainty.getData().get(positionUncertaintyInDec));
 
-        String lipAltitudeInBits = messageForParsing.substring(0, 12);
-        messageForParsing.delete(0, 12);
-        messageFromLip.addParsedPart(lipAltitudeInBits,
-                convertBinToDec(lipAltitudeInBits), calculateAltitudeFromLipBits(lipAltitudeInBits));
+            String lipAltitudeInBits = messageForParsing.substring(0, 12);
+            messageForParsing.delete(0, 12);
+            messageFromLip.addParsedPart(lipAltitudeInBits,
+                    convertBinToDec(lipAltitudeInBits), calculateAltitudeFromLipBits(lipAltitudeInBits));
+        } else if (locationShapeInDec != 0) {
+            messageFromLip.addParsedPart("", 0, "Location shape not equals to five or zero. The program cannot " +
+                    "parse further. All parsing further may be invalid");
+        }
 
         BaseProtocolUnits velocityType = lipProtocolUnits.getVelocityType();
         String velocityTypeInBits = messageForParsing.substring(0, velocityType.getCountOfBits());
@@ -118,17 +129,31 @@ public class ParserLipMessages {
         messageForParsing.delete(0, velocityType.getCountOfBits());
         messageFromLip.addParsedPart(velocityTypeInBits, velocityTypeInDec, velocityType.getData().get(velocityTypeInDec));
 
-        BaseProtocolUnits horizontalVelocity = lipProtocolUnits.getHorizontalVelocity();
-        String horizontalVelocityInBits = messageForParsing.substring(0, horizontalVelocity.getCountOfBits());
-        int horizontalVelocityInDec = convertBinToDec(horizontalVelocityInBits);
-        messageForParsing.delete(0, horizontalVelocity.getCountOfBits());
-        messageFromLip.addParsedPart(horizontalVelocityInBits, horizontalVelocityInDec, horizontalVelocity.getData().get(horizontalVelocityInDec));
+        if (velocityTypeInDec == 5) {
+            //Parse horizontal velocity with direction of travel extended
+            BaseProtocolUnits horizontalVelocity = lipProtocolUnits.getHorizontalVelocity();
+            String horizontalVelocityInBits = messageForParsing.substring(0, horizontalVelocity.getCountOfBits());
+            int horizontalVelocityInDec = convertBinToDec(horizontalVelocityInBits);
+            messageForParsing.delete(0, horizontalVelocity.getCountOfBits());
+            messageFromLip.addParsedPart(horizontalVelocityInBits, horizontalVelocityInDec, horizontalVelocity.getData().get(horizontalVelocityInDec));
 
-        BaseProtocolUnits directionOfTravelExtended = lipProtocolUnits.getDirectionOfTravelExtended();
-        String directionOfTravelExtendedInBits = messageForParsing.substring(0, directionOfTravelExtended.getCountOfBits());
-        int directionOfTravelExtendedInDec = convertBinToDec(directionOfTravelExtendedInBits);
-        messageForParsing.delete(0, directionOfTravelExtended.getCountOfBits());
-        messageFromLip.addParsedPart(directionOfTravelExtendedInBits, directionOfTravelExtendedInDec, directionOfTravelExtended.getData().get(directionOfTravelExtendedInDec));
+            BaseProtocolUnits directionOfTravelExtended = lipProtocolUnits.getDirectionOfTravelExtended();
+            String directionOfTravelExtendedInBits = messageForParsing.substring(0, directionOfTravelExtended.getCountOfBits());
+            int directionOfTravelExtendedInDec = convertBinToDec(directionOfTravelExtendedInBits);
+            messageForParsing.delete(0, directionOfTravelExtended.getCountOfBits());
+            messageFromLip.addParsedPart(directionOfTravelExtendedInBits, directionOfTravelExtendedInDec, directionOfTravelExtended.getData().get(directionOfTravelExtendedInDec));
+
+        } else if (velocityTypeInDec == 1) {
+            //Parse Horizontal velocity
+            BaseProtocolUnits horizontalVelocity = lipProtocolUnits.getHorizontalVelocity();
+            String horizontalVelocityInBits = messageForParsing.substring(0, horizontalVelocity.getCountOfBits());
+            int horizontalVelocityInDec = convertBinToDec(horizontalVelocityInBits);
+            messageForParsing.delete(0, horizontalVelocity.getCountOfBits());
+            messageFromLip.addParsedPart(horizontalVelocityInBits, horizontalVelocityInDec, horizontalVelocity.getData().get(horizontalVelocityInDec));
+        } else if (locationShapeInDec != 0) {
+            messageFromLip.addParsedPart("", 0, "Velocity type not equals to five or zero or one. The program " +
+                    "cannot parse further. All parsing further may be invalid");
+        }
 
         BaseProtocolUnits acknowledgementRequest = lipProtocolUnits.getAcknowledgementRequest();
         String acknowledgementRequestInBits = messageForParsing.substring(0, acknowledgementRequest.getCountOfBits());
@@ -153,10 +178,6 @@ public class ParserLipMessages {
             //insert user define value
             messageFromLip.addParsedPart(messageForParsing.toString(), 0, "user define value");
         }
-
-
-
-
     }
 
     private void parseShortLip(StringBuilder messageForParsing) {
